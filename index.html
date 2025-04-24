@@ -193,41 +193,50 @@
     </div>
   </div>
 
-  <script>
-    // Countdown logic
-    const countdown = document.getElementById("countdown");
-    const nextYear = new Date();
-    nextYear.setFullYear(nextYear.getFullYear() + 1);
-    nextYear.setHours(0, 0, 0, 0);
+<script>
+  const musicBtn = document.getElementById("music-btn");
+  const bgMusic = document.getElementById("bg-music");
 
-    function updateCountdown() {
-      const now = new Date();
-      const diff = nextYear - now;
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((diff / (1000 * 60)) % 60);
-      const seconds = Math.floor((diff / 1000) % 60);
-      countdown.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+  // Start assuming it's NOT playing
+  let isPlaying = false;
+
+  // Update button text based on actual state
+  function updateButton() {
+    musicBtn.textContent = isPlaying ? "Pause Music" : "Play Music";
+  }
+
+  // Handle play/pause toggle
+  function toggleMusic() {
+    if (isPlaying) {
+      bgMusic.pause();
+    } else {
+      bgMusic.play().catch((err) => {
+        console.log("Audio play failed:", err);
+      });
     }
+    isPlaying = !isPlaying;
+    updateButton();
+  }
 
-    setInterval(updateCountdown, 1000);
-    updateCountdown();
+  // Make sure music starts on first interaction
+  function initMusicOnce() {
+    if (!isPlaying) {
+      bgMusic.play().then(() => {
+        isPlaying = true;
+        updateButton();
+      }).catch(() => {
+        console.log("Autoplay blocked. Waiting for user interaction.");
+      });
+    }
+    document.body.removeEventListener("click", initMusicOnce);
+  }
 
-    // Music toggle
-    const musicBtn = document.getElementById("music-btn");
-    const bgMusic = document.getElementById("bg-music");
-    let isPlaying = true;
+  musicBtn.addEventListener("click", toggleMusic);
+  document.body.addEventListener("click", initMusicOnce);
 
-    musicBtn.addEventListener("click", () => {
-      if (isPlaying) {
-        bgMusic.pause();
-        musicBtn.textContent = "Play Music";
-      } else {
-        bgMusic.play();
-        musicBtn.textContent = "Pause Music";
-      }
-      isPlaying = !isPlaying;
-    });
-  </script>
+  // Initial button label
+  updateButton();
+</script>
+
 </body>
 </html>
