@@ -194,49 +194,85 @@
   </div>
 
 <script>
-  const musicBtn = document.getElementById("music-btn");
-  const bgMusic = document.getElementById("bg-music");
-
-  // Start assuming it's NOT playing
-  let isPlaying = false;
-
-  // Update button text based on actual state
-  function updateButton() {
-    musicBtn.textContent = isPlaying ? "Pause Music" : "Play Music";
-  }
-
-  // Handle play/pause toggle
-  function toggleMusic() {
-    if (isPlaying) {
-      bgMusic.pause();
-    } else {
-      bgMusic.play().catch((err) => {
-        console.log("Audio play failed:", err);
-      });
+    const musicBtn = document.getElementById("music-btn");
+    const bgMusic = document.getElementById("bg-music");
+  
+    // Start assuming it's NOT playing
+    let isPlaying = false;
+  
+    // Update button text based on actual state
+    function updateButton() {
+      musicBtn.textContent = isPlaying ? "Pause Music" : "Play Music";
     }
-    isPlaying = !isPlaying;
+  
+    // Handle play/pause toggle
+    function toggleMusic() {
+      if (isPlaying) {
+        bgMusic.pause();
+      } else {
+        bgMusic.play().catch((err) => {
+          console.log("Audio play failed:", err);
+        });
+      }
+      isPlaying = !isPlaying;
+      updateButton();
+    }
+  
+    // Make sure music starts on first interaction
+    function initMusicOnce() {
+      if (!isPlaying) {
+        bgMusic.play().then(() => {
+          isPlaying = true;
+          updateButton();
+        }).catch(() => {
+          console.log("Autoplay blocked. Waiting for user interaction.");
+        });
+      }
+      document.body.removeEventListener("click", initMusicOnce);
+    }
+  
+    musicBtn.addEventListener("click", toggleMusic);
+    document.body.addEventListener("click", initMusicOnce);
+  
+    // Initial button label
     updateButton();
-  }
+  
+  
+  
+  
+  
+    
+  const countdown = document.getElementById("countdown");
 
-  // Make sure music starts on first interaction
-  function initMusicOnce() {
-    if (!isPlaying) {
-      bgMusic.play().then(() => {
-        isPlaying = true;
-        updateButton();
-      }).catch(() => {
-        console.log("Autoplay blocked. Waiting for user interaction.");
-      });
+  // Set the next birthday to exactly one year from today
+  const now = new Date();
+  const nextBirthday = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
+
+  function updateCountdown() {
+    const currentTime = new Date();
+    const timeLeft = nextBirthday - currentTime;
+
+    if (timeLeft <= 0) {
+      countdown.textContent = "Happy Birthday again!";
+      return;
     }
-    document.body.removeEventListener("click", initMusicOnce);
+
+    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeLeft / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((timeLeft / (1000 * 60)) % 60);
+    const seconds = Math.floor((timeLeft / 1000) % 60);
+
+    countdown.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
   }
 
-  musicBtn.addEventListener("click", toggleMusic);
-  document.body.addEventListener("click", initMusicOnce);
+  updateCountdown(); // Initial call
+  setInterval(updateCountdown, 1000); // Update every second
 
-  // Initial button label
-  updateButton();
-</script>
+
+  
+  
+  
+  </script>
 
 </body>
 </html>
